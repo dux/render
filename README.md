@@ -1,4 +1,7 @@
-render
+render.js
 ======
 
-JavaScript two way data binding and DOM templating
+JavaScript jQuery two way data binding and DOM templating
+
+Examples on:
+http://stash.trifolium.hr/render_plugin
