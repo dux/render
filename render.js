@@ -1,4 +1,9 @@
+// Released under MIT license
+// Copyright (c) 2013 Dino Reic (@dux)
+// https://github.com/dux/render
+
 (function() {
+
   $.extend({
     cachedScript: function(url, options) {
       if (typeof options === "function") {
