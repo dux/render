@@ -3,7 +3,6 @@
 // https://github.com/dux/render
 
 (function() {
-
   $.extend({
     cachedScript: function(url, options) {
       if (typeof options === "function") {
