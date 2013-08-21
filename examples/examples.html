@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Stash bucket</title>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.2.1/jquery-migrate.min.js" type="text/javascript"></script>
+    <script src="http://rawgithub.com/dux/render/master/jquery.render.js" type="text/javascript"></script>
+    <script src="./example.js" type="text/javascript"></script>
+    <style>
+      .box { border:1px solid #ddd; padding:10px; border-radius: 5px;}
+      body { margin-top:50px; }
+    </style>
+  </head>
+  <body>
+    <div id='full_page'>
+      <div class='navbar navbar-fixed-top'>
+        <div class='navbar-inner'>
+          <div class='container'>
+            <img alt="Recycle_empty" onclick="PopupT.render(this, 'bucket_list', {}); return false;" src="http://png.findicons.com/files/icons/1763/milanioom/64/recycle_empty.png" style="position:absolute; width:48px; height:48px; margin-left:-55px; margin-top:3px; border-radius:3px; display:block; cursor:pointer;" />
+            <a class='brand pjax' href='/' style='display:inline-block; width:212px;'>Stash bucket</a>
+            <div class='nav-collapse'>
+              <ul class='nav pull-right'>
+                <li style='padding-right:7px;'>
+                  <button class='btn btn-info fr' onclick="PopupT.render(this, 'new_bucket', {}); return false;">Create Bucket</button>
+                </li>
+                
+                <li title='profile'>
+                  <a href='/profile' style=' padding:0 !important;'><img alt="Aee7eabef46c69a79d95081ee6946389?s=200&amp;d=http%3a%2f%2fstatic1" src="http://www.gravatar.com/avatar/aee7eabef46c69a79d95081ee6946389?s=200&amp;d=http%3A%2F%2Fstatic1.robohash.org%2F1.png%3Fset%3Dset2%26size%3D200x200" style="width:40px; height:40px;" /></a>
+                </li>
+              </ul>
+              <ul class='nav'>
+              </ul>
+              <form action='/' class='navbar-form'>
+                <input class='ac_search' name='filter' placeholder='search...' style='width:205px;' />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='container'>
+        <div id='content'>
+          <script src="/_compiled/once_render_example.js?1377074064" type="text/javascript"></script>
+          <style>
+            .box input { margin:0px; }
+            .navbar { display:none; }
+            body { background:#fff; }
+          </style>
+          <div class='row'>
+            <div class='span12'>
+              <a href='https://github.com/dux/render' target='_new'><img alt="Github-download-button" src="http://lime.outlawgametools.com/wp-content/uploads/2012/06/gitHub-download-button.png" style="float:right; width:150px;" /></a>
+              <h1>Render.js examples</h1>
+              <p>All examples are in coffee script. If everything else fails, covert here <a target="_new" href="http://js2coffee.org">http://js2coffee.org/</a></p>
+            </div>
+            <div class='span7'>
+              <pre template='basic'>template: """
+                  &lt;H3>URL bind&lt;/H3>
+                  &lt;input bind='link' />&lt;button class='btn'>Submit&lt;/button>
+                  &lt;div if='link'>URL here&lt;/div>&lt;div if='! link'>NO URL&lt;/div>&lt;/div>"""</pre>
+              <pre template='basic2'>template: """
+                  &lt;H3>URL bind&lt;/H3>
+                  &lt;input bind='link' />&lt;button class='btn' bind="btn">Submit&lt;/button>"""
+                onchange: ->
+                  return @node.btn.disable 'Link is req' unless @data.link
+                  return @node.btn.disable 'At least 5 chrs' if @data.link.length &lt; 5
+                  @node.btn.enable 'Submit'</pre>
+              <pre template='timer'>template: """
+                  &lt;H3>Timer in ms&lt;/H3>
+                  &lt;div>&lt;button bind="start">Start&lt;/button>&lt;button bind="stop">Stop&lt;/button>&lt;/div>
+                  &lt;div bind="time">&lt;/div>
+                  """
+                start_timer: ->
+                  @_timer = setInterval =>
+                    @node.time.html (new Date()).getTime()
+                    @node.start.disable()
+                    @node.stop.enable()
+                  , 100
+                once: ->
+                  @start_timer()
+                bind:
+                  start:->
+                    @start_timer()
+                  stop: (node)->
+                    clearInterval @_timer
+                    @node.start.enable()
+                    @node.stop.disable()</pre>
+              <pre template='todo'>template: """
+                  &lt;h3>To to (&lt;span bind="count">&lt;/span>)&lt;/h3>
+                  &lt;form bind="add_todo">
+                  &lt;input bind="todo" />
+                  &lt;/form>
+                  &lt;ul bind="out">&lt;/ul>
+                  """
+                data:
+                  list:['buy milk']
+                bind:
+                  add_todo: ->
+                    return unless @data.todo
+                    @data.list.push @data.todo
+                    @data.todo = ''
+                onchange: ->
+                  ret = []
+                  for el in @data.list
+                    ret.push "&lt;li>#{el}&lt;/li>"
+                  @data.out = ret.join("\n")
+                  @data.count = @data.list.length</pre>
+              <pre template='markdown'>script: 'https://raw.github.com/evilstreak/markdown-js/master/lib/markdown.js'
+                template: """
+                  &lt;h3>Markdown data&lt;/h3>
+                  &lt;textarea bind="md_data" style="width:96%; height:100px;">&lt;/textarea>
+                  &lt;h4>Preview&lt;/h4>
+                  &lt;div bind="md_prev" style="background:#eee;padding:5px;">&lt;/div>
+                  """
+                onchange: ->
+                  @node.md_prev.html = markdown.toHTML(@data.md_data)</pre>
+            </div>
+            <div class='span5'>
+              <h3>Call in any way</h3>
+              <pre>$(node).render(opts, data)</pre>
+              <pre>Render.to(node, opts, data)</pre>
+              <h4>You can use inline templates</h4>
+              <pre>&lt;div id="inline">
+                &lt;H3>URL bind&lt;/H3>
+                &lt;form bind="hclick">
+                  &lt;input bind='link' />
+                  &lt;button class='btn'>Submit&lt;/button>
+                &lt;/form>
+              &lt;/div>
+              &lt;script>
+                $('#inline').render(opts)
+              &lt;/script></pre>
+              <h3>Options</h3>
+              <pre>$(node).render(opts, data)
+              ---
+              node: '#node' || [DOM object] || [jQuery object]
+              data: {}
+              opts:
+                template
+                  #data           : takes .html()
+                  /ajax.html      : $.get and render
+                  f(data) {}      : execute() and render
+                  &lt;div>blah&lt;/div> : raw data
+                script: [scripts to preload]     
+                bind:
+                  el_on_state_change:(node, value) ->
+                    function data        
+                data: { el1:1, el2:2, ... }</pre>
+              <h3>Default binds</h3>
+              <pre>button - onclick
+              form - onsubmit
+              input[type=text] - onkeyup
+              input[type=checkbox] - onclick</pre>
+              <h3>Methods</h3>
+              <pre># Render in element
+              Render.to(node, opts, data)
+              
+              # Replad render part
+              Render.refresh(any_dom_or_jQuery_node_inside_part)</pre>
+            </div>
+          </div>
+        </div>
+        <div id='footer'>
+          <a class='fr' href='#'>Top of the page</a>
+          <p>
+            <a href="/" target="_new" style="color:#aaa;">ubuntu</a><sup>&copy;</sup>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
