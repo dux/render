@@ -15,15 +15,15 @@
 
   this.Example = {
     basic: {
-      title: 'Basic binding template, no code',
+      title: 'Basic IF testing, no code, pure bind',
       render: {
-        template: "<H3>URL bind</H3>\n<input bind='link' /><button class='btn'>Submit</button>\n<div if='link'>URL here</div><div if='! link'>NO URL</div></div>"
+        template: "<h4>TRUE if link present</h4>\n<input bind='link' />\n<p if='link'>URL here</p><p if='! link'>NO URL</div></p>"
       }
     },
     basic2: {
       title: 'Simple code',
       render: {
-        template: "<H3>URL bind</H3>\n<input bind='link' /><button class='btn' bind=\"btn\">Submit</button>",
+        template: "<h4>URL bind</h4>\n<input bind='link' /><button class='btn' bind=\"btn\">Submit</button>",
         onchange: function() {
           if (!this.data.link) return this.node.btn.disable('Link is req');
           if (this.data.link.length < 5) {
@@ -36,7 +36,7 @@
     timer: {
       title: 'Timer in ms with stop - start',
       render: {
-        template: "<H3>Timer in ms</H3>\n<div><button bind=\"start\">Start</button><button bind=\"stop\">Stop</button></div>\n<div bind=\"time\"></div>",
+        template: "<h4>Timer in ms</h4>\n<div><button bind=\"start\">Start</button><button bind=\"stop\">Stop</button></div>\n<div bind=\"time\"></div>",
         start_timer: function() {
           var _this = this;
           return this._timer = setInterval(function() {
@@ -63,7 +63,7 @@
     todo: {
       title: 'To-do list',
       render: {
-        template: "<h3>To to (<span bind=\"count\"></span>)</h3>\n<form bind=\"add_todo\">\n<input bind=\"todo\" />\n</form>\n<ul bind=\"out\"></ul>",
+        template: "<h4>To to (<span bind=\"count\"></span>)</h4>\n<form bind=\"add_todo\">\n<input bind=\"todo\" />\n</form>\n<ul bind=\"out\"></ul>",
         data: {
           list: ['buy milk']
         },
@@ -91,11 +91,22 @@
       title: 'Preload Javascript and render markdown',
       render: {
         script: 'https://raw.github.com/evilstreak/markdown-js/master/lib/markdown.js',
-        template: "<h3>Markdown data</h3>\n<textarea bind=\"md_data\" style=\"width:96%; height:100px;\"></textarea>\n<h4>Preview</h4>\n<div bind=\"md_prev\" style=\"background:#eee;padding:5px;\"></div>",
+        template: "<h4>Markdown data</h4>\n<textarea bind=\"md_data\" style=\"width:96%; height:100px;\"></textarea>\n<h4>Preview</h4>\n<div bind=\"md_prev\" style=\"background:#eee;padding:5px;\"></div>",
         onchange: function() {
           var markdown_text;
           markdown_text = markdown.toHTML(this.data.md_data);
           return this.data.md_prev = markdown_text;
+        }
+      }
+    },
+    form: {
+      title: 'Simple form example',
+      render: {
+        template: "<h4>Type in name and hit enter</h4>\n<form bind=\"form\">\n  <input name=\"user_name\" value=\"Miki\" />\n</form>",
+        bind: {
+          form: function(form_node, form_data) {
+            return alert("You typed: " + form_data.user_name);
+          }
         }
       }
     }
@@ -107,14 +118,14 @@
       val = Example[key];
       node = $("#render-" + key);
     }
-    return $('xmp').each(function() {
+    return $('pre').each(function() {
       var data, tpl;
       node = $(this);
       node.html(node.html().replace(/^\s+/, "  ").replace(/\n\s{14}/g, "\n"));
       tpl = node.attr('template');
       data = Example[tpl];
       if (!tpl) return;
-      node.html("$(node).render\n" + node.html());
+      node.html("$(node).render\n  " + node.html());
       node.before("<hr><h2>" + data.title + "</h2>");
       return node.after('<div class="box" />').next().render(data.render);
     });

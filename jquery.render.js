@@ -1,8 +1,5 @@
-// Released under MIT license
-// Copyright (c) 2013 Dino Reic (@dux)
-// https://github.com/dux/render
-
 (function() {
+
   $.extend({
     cachedScript: function(url, options) {
       if (typeof options === "function") {
@@ -17,6 +14,15 @@
         url: url
       });
       return $.ajax(options);
+    },
+    speed: function() {
+      var _this = this;
+      this.time = $.now();
+      return function() {
+        var ms;
+        ms = ("" + ($.now() - _this.time)).replace(/(\d)(\d{3})$/, '$1.$2');
+        return "(" + ms + " ms)";
+      };
     }
   });
 
@@ -68,7 +74,7 @@
       return $(node).closest('.render-box').data('scope');
     },
     to: function(node, opts, data) {
-      var script, template,
+      var script, speed, template,
         _this = this;
       opts.body = $(node);
       if (data) opts.data = data;
@@ -96,7 +102,10 @@
       if (typeof template === 'object' || /^#\w/.test(template)) {
         template = $(template).html();
       } else if (this.is_link(template)) {
+        opts.__template = template;
+        speed = $.speed();
         $.get(template, function(ret) {
+          console.log("Render ajax GET " + (speed()) + ": " + template);
           opts.template = ret;
           return _this.to(opts.body, opts);
         });
@@ -106,7 +115,7 @@
         template = opts.template = node.html();
         node.show();
       }
-      template = template.replace(/\$scope\./g, 'Render.scope(this).');
+      opts.template = opts.template.replace(/\$scope\./g, 'Render.scope(this).');
       opts.set = function(key, val) {
         opts.data[key] = val;
         node = this.node[key];
@@ -123,15 +132,21 @@
       return this.render(opts);
     },
     render: function(opts) {
-      var _this = this;
+      var first_node,
+        _this = this;
       opts.body.html("<div class='render-box'>" + opts.template + "</div>");
-      opts.body.find('div').first().data('scope', opts);
+      first_node = opts.body.find('div').first();
+      if (opts.__template) opts.template = opts.__template;
+      first_node.data('scope', opts);
+      opts.refresh = function() {
+        return Render.refresh(first_node);
+      };
       opts.body.exportByAttr('bind', function(node, bind_var) {
         var keys, node_name;
         node_name = node[0].nodeName.toLowerCase();
         keys = bind_var.split('-', 2);
         bind_var = keys.shift();
-        if (['data', 'template', 'bind', 'once', 'onchange', 'node', 'script'].indexOf(bind_var) > -1) {
+        if (bind_var === 'data' || bind_var === 'template' || bind_var === 'bind' || bind_var === 'once' || bind_var === 'onchange' || bind_var === 'node' || bind_var === 'script') {
           alert("Render error: [" + bind_var + "] for bind= is reserved word");
           return;
         }
@@ -157,7 +172,9 @@
             });
             if (opts.bind[bind_var]) {
               node.on('focus', function() {});
-              if (opts.bind[bind_var]) return opts.bind[bind_var](node, keys[0]);
+              if (opts.bind[bind_var]) {
+                return opts.bind[bind_var].apply(opts, [node, keys[0]]);
+              }
             }
           }
         } else if (node_name === 'form') {
@@ -175,12 +192,12 @@
       return this.onchange_default(opts);
     },
     onchange_default: function(opts) {
-      var key, node, _ref,
+      var key, node, _ref, _ref2,
         _this = this;
       _ref = opts.node;
       for (key in _ref) {
         node = _ref[key];
-        if (['TEXTAREA', 'INPUT', 'SELECT'].indexOf(node[0].nodeName) > -1) {
+        if ((_ref2 = node[0].nodeName) === 'TEXTAREA' || _ref2 === 'INPUT' || _ref2 === 'SELECT') {
           node.val(opts.data[key]);
         } else {
           node.html(opts.data[key]);
